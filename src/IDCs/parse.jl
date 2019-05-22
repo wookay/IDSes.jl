@@ -13,14 +13,14 @@ function isidc(c::Char)
 end
 
 function Base.parse(::Type{IDS}, s::String)::IDS
-    isempty(s) && return
+    isempty(s) && throw(IDSError("Invalid IDS"))
     feed = collect(s)
     c = first(feed)
     if isidc(c)
         T = getfield(IDCs, Symbol(c))
         (d, next) = parseids(T, UnionCharDC[], feed[2:end])
         isempty(next) && return IDS(d)
-        throw(IDSError(string("Invalid IDS ", next)))
+        throw(IDSError(string("Invalid IDS about ", next)))
     else
         throw(IDSError("Invalid IDS"))
     end
@@ -31,7 +31,7 @@ function parseids(Tdc::Type, dcs::Vector{UnionCharDC}, feed::Vector{Char})::Tupl
         d = Tdc(dcs...)
         return (d, feed)
     else
-        c = first(feed) 
+        c = first(feed)
         if isidc(c)
             T = getfield(IDCs, Symbol(c))
             (d, next) = parseids(T, UnionCharDC[], feed[2:end])
